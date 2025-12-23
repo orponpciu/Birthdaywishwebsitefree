@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Name | A Magical Journey</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Outfit:wght@200;400;700&family=Pinyon+Script&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- 1. GLOBAL VARIABLES & RESET --- */
+        :root {
+            --bg-dark: #0a0a0c;
+            --accent-gold: #eebb44;
+            --accent-pink: #ff006e;
+            --accent-purple: #7b2cbf;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f0f0f0;
+            --font-display: 'Playfair Display', serif;
+            --font-title: 'Cinzel', serif;
+            --font-script: 'Pinyon Script', cursive;
+            --font-ui: 'Outfit', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: var(--font-ui);
+            overflow-x: hidden; 
+            overflow-y: auto; /* Force vertical scroll */
+            min-height: 100vh;
+            width: 100vw;
+            position: relative;
+            cursor: none;
+            transition: background-color 2s ease;
+        }
+
+        /* --- GEN Z FEATURE: NOISE OVERLAY --- */
+        .noise-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 9000;
+            opacity: 0.07;
+            background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MDAiIGhlaWdodD0iNTAwIj48ZmlsdGVyIGlkPSJub2lzZSI+PHZlZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC42NSIgbnVtT2N0YXZlcz0iMyIgc3RpdGNoVGlsZXM9InN0aXRjaCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNub2lzZSkiIG9wYWNpdHk9IjEiLz48L3N2Zz4=');
+        }
+
+        /* --- 2. BACKGROUNDS & MESH --- */
+        .ambient-mesh {
+            position: fixed; 
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background: radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+                        radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+                        radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+            filter: blur(80px);
+            opacity: 0.6;
+            animation: meshMove 20s ease-in-out infinite alternate;
+            transition: opacity 2s ease;
+        }
+
+        body.lights-out { background-color: #000; }
+        body.lights-out .ambient-mesh { opacity: 0; }
+
+        @keyframes meshMove {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1); }
+        }
+
+        /* --- 3. CUSTOM CURSOR --- */
+        #cursor {
+            width: 20px; height: 20px;
+            border: 1px solid var(--accent-gold);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.1s;
+            mix-blend-mode: exclusion;
+        }
+        #cursor-dot {
+            width: 4px; height: 4px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 10000;
+        }
+        body:active #cursor { transform: scale(0.8); }
+
+        /* --- 4. STAGE MANAGEMENT --- */
+        .stage {
+            min-height: 100vh;
+            width: 100%;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            text-align: center;
+            position: absolute; top: 0; left: 0;
+            padding: 40px 20px 120px 20px; 
+            z-index: 10;
+        }
+
+        .hidden { display: none !important; opacity: 0; pointer-events: none; }
+        .fade-in { animation: fadeIn 1.5s ease forwards; }
+        .fade-out { animation: fadeOut 1s ease forwards; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes fadeOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-20px); } }
+
+        /* --- 5. UI COMPONENTS --- */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 3rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            max-width: 800px;
+            width: 90%; 
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .glass-panel::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.05), transparent);
+            transform: skewX(-25deg);
+            animation: shine 8s infinite;
+        }
+        @keyframes shine { 0%, 80% { left: -100%; } 100% { left: 200%; } }
+
+        .btn {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--glass-border);
+            color: var(--accent-gold);
+            padding: 1rem 2.5rem;
+            font-family: var(--font-title);
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            border-radius: 50px;
+            margin-top: 2rem;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+            z-index: 20;
+            overflow: hidden;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .btn:hover {
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 30px rgba(238, 187, 68, 0.15);
+            background: rgba(238, 187, 68, 0.05);
+        }
+
+        h1.hero-title {
+            font-family: var(--font-title);
+            font-size: clamp(2.5rem, 5vw, 5rem);
+            line-height: 1.1;
+            background: linear-gradient(135deg, #fff 0%, var(--accent-gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .script-text {
+            font-family: var(--font-script);
+            font-size: 2.5rem;
+            color: var(--accent-gold);
+            margin-bottom: 1rem;
+        }
+
+        /* --- 6. PHOTO FRAME --- */
+        .photo-frame {
+            background-color: #fff;
+            padding: 10px 10px 50px 10px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            transform: rotate(-3deg);
+            margin: 2rem 0;
+            max-width: 320px;
+            width: 80vw;
+            transition: transform 0.1s;
+            position: relative;
+            z-index: 5;
+        }
+        .photo-frame img { width: 100%; height: auto; display: block; filter: grayscale(20%); transition: filter 0.5s;}
+        .photo-frame:hover img { filter: grayscale(0%); }
+        .photo-caption {
+            position: absolute; bottom: 10px; left: 0; width: 100%;
+            text-align: center; font-family: var(--font-script);
+            font-size: 2rem; color: #1a1a1a;
+        }
+
+        /* --- 7. 3D QUOTE STACK --- */
+        .gallery-container { 
+            position: relative; 
+            width: 320px; 
+            max-width: 90vw; 
+            height: 450px; /* Default height for desktop */
+            perspective: 1000px; 
+            margin: 0 auto; 
+            margin-bottom: 2rem; /* Add spacing so buttons don't overlap */
+        }
+        .quote-card {
+            position: absolute; width: 100%; height: 100%;
+            border-radius: 20px;
+            background: linear-gradient(145deg, #151515, #222);
+            border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.6s ease;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 2rem; text-align: center;
+        }
+        .quote-card:nth-child(1) { transform: rotate(-3deg) translateZ(0); z-index: 4; }
+        .quote-card:nth-child(2) { transform: rotate(3deg) translateZ(-10px); z-index: 3; }
+        .quote-card:nth-child(3) { transform: rotate(-2deg) translateZ(-20px); z-index: 2; }
+        .quote-card:nth-child(4) { transform: rotate(2deg) translateZ(-30px); z-index: 1; }
+        
+        .quote-content { font-family: var(--font-display); font-size: 1.3rem; font-style: italic; line-height: 1.6; margin-bottom: 1rem; color: #ddd;}
+        .quote-author { color: var(--accent-gold); font-family: var(--font-title); font-size: 0.9rem; letter-spacing: 2px; }
+
+        /* --- 8. FLIP CARDS --- */
+        .flip-grid { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-top: 2rem; width: 100%; }
+        .flip-card {
+            background-color: transparent; width: 220px; height: 300px;
+            perspective: 1000px; cursor: pointer;
+        }
+        .flip-inner {
+            position: relative; width: 100%; height: 100%;
+            text-align: center; transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+        }
+        .flip-card:hover .flip-inner, .flip-card.flipped .flip-inner { transform: rotateY(180deg); }
+        .flip-front, .flip-back {
+            position: absolute; width: 100%; height: 100%;
+            -webkit-backface-visibility: hidden; backface-visibility: hidden;
+            border-radius: 15px; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; padding: 20px;
+            border: 1px solid var(--glass-border);
+        }
+        .flip-front { background: rgba(255,255,255,0.03); color: var(--accent-gold); backdrop-filter: blur(5px); }
+        .flip-front h3 { font-family: var(--font-title); font-size: 2rem; }
+        .flip-back { background: #1a1a1a; color: white; transform: rotateY(180deg); border: 1px solid var(--accent-gold); }
+        .flip-back p { font-size: 1rem; font-style: italic; font-family: var(--font-display); line-height: 1.4; }
+
+        /* --- 9. LETTER --- */
+        .letter-content { font-size: 1.1rem; line-height: 1.8; color: #eee; text-align: left; min-height: 200px; font-weight: 300;}
+        .typewriter-cursor::after { content: '|'; animation: blink 1s step-start infinite; color: var(--accent-gold); }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* --- 10. MUSIC WIDGET --- */
+        .music-widget {
+            position: fixed; bottom: 30px; left: 30px;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 10px 20px; border-radius: 30px;
+            display: flex; align-items: center; gap: 15px;
+            z-index: 9900;
+            transition: transform 0.3s ease;
+        }
+        .music-widget:hover { transform: scale(1.05); border-color: var(--accent-gold); }
+        .music-icon { width: 30px; height: 30px; background: var(--accent-gold); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: #000; font-size: 12px; }
+        .music-info { display: flex; flex-direction: column; align-items: flex-start; }
+        .music-title { font-size: 0.8rem; font-weight: 700; color: #fff; }
+        .music-artist { font-size: 0.7rem; color: #aaa; }
+        
+        .equalizer { display: flex; gap: 3px; height: 15px; align-items: flex-end; }
+        .bar { width: 3px; background-color: var(--accent-gold); animation: bounce 1s infinite ease-in-out; }
+        .bar:nth-child(2) { animation-delay: 0.2s; height: 60%; }
+        .bar:nth-child(3) { animation-delay: 0.4s; height: 30%; }
+        @keyframes bounce { 0%, 100% { height: 20%; } 50% { height: 100%; } }
+
+        /* --- 11. MEMORIES --- */
+        .memories-container {
+            display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;
+            max-width: 900px;
+        }
+        .polaroid {
+            background: #fff;
+            padding: 10px 10px 40px 10px;
+            width: 200px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            filter: grayscale(30%);
+            position: relative;
+        }
+        .polaroid img { 
+            width: 100%; 
+            height: auto; 
+            display: block; 
+            filter: sepia(20%); 
+        }
+        .polaroid:hover {
+            transform: scale(1.15) rotate(0deg) !important;
+            z-index: 100;
+            filter: grayscale(0%);
+            box-shadow: 0 20px 50px rgba(238, 187, 68, 0.2);
+        }
+        .polaroid:nth-child(1) { transform: rotate(-5deg) translateY(10px); }
+        .polaroid:nth-child(2) { transform: rotate(3deg) translateY(-10px); }
+        .polaroid:nth-child(3) { transform: rotate(-3deg) translateY(5px); }
+        .polaroid:nth-child(4) { transform: rotate(6deg) translateY(-5px); }
+
+        /* --- 12. CANDLE --- */
+        .candle-wrapper { position: relative; margin-top: 50px; cursor: pointer; transition: opacity 1s; }
+        .candle-stick {
+            width: 30px; height: 120px; background: linear-gradient(to right, #fff, #e0e0e0);
+            border-radius: 4px; box-shadow: 0 0 20px rgba(255,255,255,0.2); margin: 0 auto;
+        }
+        .flame {
+            width: 15px; height: 35px; background: radial-gradient(white, #ffcc00, #ff4500);
+            border-radius: 50% 50% 20% 20%; position: absolute; top: -40px; left: 50%;
+            transform: translateX(-50%); animation: flicker 0.1s infinite alternate;
+            box-shadow: 0 0 20px #ffcc00, 0 0 40px #ff4500; transition: 0.5s;
+        }
+        @keyframes flicker {
+            0% { transform: translateX(-50%) scale(1); opacity: 1; }
+            100% { transform: translateX(-50%) scale(1.1) rotate(2deg); opacity: 0.9; }
+        }
+        .candle-wrapper.blown .flame { opacity: 0; animation: none; }
+        
+        .glow-message {
+            opacity: 0; font-family: var(--font-script); font-size: 4rem; color: var(--accent-gold);
+            text-shadow: 0 0 20px var(--accent-gold); margin-top: 2rem; transition: opacity 2s ease;
+        }
+        .visible { opacity: 1; }
+
+        /* Particles */
+        .heart-trail {
+            position: fixed; color: var(--accent-pink); font-size: 20px;
+            pointer-events: none; animation: floatUp 1s ease-out forwards; z-index: 9998;
+        }
+        @keyframes floatUp { to { transform: translateY(-50px) scale(0); opacity: 0; } }
+
+        .firework-particle {
+            position: fixed; font-size: 1.5rem; pointer-events: none; z-index: 9999;
+            animation: explode 1.5s ease-out forwards; text-shadow: 0 0 10px rgba(255, 77, 77, 0.8);
+        }
+        @keyframes explode { to { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; } }
+
+        /* --- MOBILE OPTIMIZATIONS --- */
+        @media (max-width: 768px) {
+            body { cursor: auto; }
+            #cursor, #cursor-dot { display: none; }
+            
+            .glass-panel { padding: 1.5rem; }
+            .hero-title { font-size: 2rem; }
+            .script-text { font-size: 1.8rem; }
+            
+            /* --- FIX FOR BUTTONS HIDING --- */
+            .gallery-container {
+                height: 300px;
+                margin-top: 1rem;
+            }
+            .quote-card { padding: 1.2rem; }
+            .quote-content { font-size: 1.1rem; line-height: 1.4; }
+
+            /* --- FIX FOR LETTER & BUTTON CUTOFF --- */
+            #stage-5 {
+                justify-content: flex-start;
+                padding-top: 15vh;
+                padding-bottom: 150px; 
+                height: auto;
+                min-height: 100vh;
+                overflow-y: scroll;
+            }
+            .letter-content {
+                font-size: 1rem; 
+                line-height: 1.5;
+                min-height: 150px; 
+            }
+
+            /* --- FIX FOR SCROLLING STAGES (Photos & Mom Tribute) --- */
+            /* Both Stage 6 and Stage 7 need scrolling on mobile */
+            #stage-6, #stage-7 {
+                justify-content: flex-start;
+                padding-top: 10vh;
+                padding-bottom: 150px;
+                height: auto;
+                min-height: 100vh;
+                overflow-y: auto;
+            }
+            .memories-container { 
+                flex-direction: column; 
+                align-items: center; 
+                gap: 30px; 
+            }
+            .polaroid {
+                width: 70%; 
+                max-width: 300px;
+            }
+            .polaroid:nth-child(n) { 
+                transform: rotate(0) translateY(0); 
+                margin-bottom: 0; 
+            }
+
+            /* --- FIX FOR FINAL WISH MESSAGE HIDING --- */
+            .glow-message { font-size: 2.5rem; margin-top: 1rem; }
+            .candle-wrapper { margin-top: 30px; }
+
+            .music-widget {
+                bottom: 10px; left: 50%; transform: translateX(-50%);
+                width: 90%; justify-content: space-between;
+            }
+            .music-widget:hover { transform: translateX(-50%) scale(1); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="noise-overlay"></div>
+    <div class="ambient-mesh"></div>
+    
+    <audio id="bg-music" loop>
+        <source src="https://cdn.pixabay.com/download/audio/2025/07/02/audio_90ee6073fd.mp3?filename=happy-birthday-368842.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="music-widget hidden fade-in" id="music-pill">
+        <div style="display:flex; align-items:center; gap:10px;">
+            <div class="music-icon">🎵</div>
+            <div class="music-info">
+                <span class="music-title">Happy Birthday</span>
+                <span class="music-artist">Special Occasion</span>
+            </div>
+        </div>
+        <div class="equalizer">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+        </div>
+    </div>
+
+    <div id="cursor"></div>
+    <div id="cursor-dot"></div>
+
+    <div id="stage-1" class="stage">
+        <div class="glass-panel fade-in">
+            <p class="script-text">For Name</p>
+            <h1 class="hero-title" style="font-size: 2.5rem;">Someone special was born today...</h1>
+            <p style="margin-bottom: 2rem; color: #aaa;">Put on your headphones for the best experience.</p>
+            <button class="btn magnetic-btn" onclick="startJourney()">Begin Journey</button>
+        </div>
+    </div>
+
+    <div id="stage-2" class="stage hidden">
+        <p class="script-text fade-in">My Favorite Person</p>
+        <h1 class="hero-title fade-in" data-value="Happy Birthday" id="hacker-title" style="animation-delay: 0.3s;">Happy Birthday</h1>
+        <h1 class="hero-title fade-in" style="animation-delay: 0.4s; font-size: 3rem; margin-top:-20px;">Name</h1>
+        
+    <div class="photo-frame fade-in" id="tilt-photo" style="animation-delay: 0.6s; max-width: 180px; padding-bottom: 25px; margin: 10px 0;">
+    <img src="https://picsum.photos/400/600?random=1" alt="Magic">
+    <div class="photo-caption" style="font-size: 1.5rem; bottom: 5px;">Magic</div>
+    </div>
+
+        <button class="btn fade-in magnetic-btn" style="animation-delay: 1s;" onclick="nextStage(2)">Why I Choose You</button>
+    </div>
+
+    <div id="stage-3" class="stage hidden">
+        <h2 style="font-family: var(--font-title); margin-bottom: 2rem; font-size: 2rem;">Reasons I Love You</h2>
+        
+        <div class="gallery-container">
+            <div class="quote-card">
+                <p class="quote-content">"I didn’t fall in love with your presence; I fell in love with your soul. Distance couldn’t stop it, and time only made it stronger."</p>
+                <span class="quote-author">Reason 1</span>
+            </div>
+            <div class="quote-card">
+                <p class="quote-content">"You are the peace I find at the end of every chaotic day. Just the thought of you makes the world feel like home."</p>
+                <span class="quote-author">Reason 2</span>
+            </div>
+            <div class="quote-card">
+                <p class="quote-content">"I choose you every day, even without holding your hand. That’s how I know this is real."</p>
+                <span class="quote-author">Reason 3</span>
+            </div>
+            <div class="quote-card">
+                <p class="quote-content">"We haven’t met yet, but my heart already knows you. Love isn't measured by miles, but by how deeply someone changes you."</p>
+                <span class="quote-author">Reason 4</span>
+            </div>
+        </div>
+
+        <div style="margin-top: 1rem; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; width: 100%;">
+            <button class="btn magnetic-btn" onclick="nextQuote()" style="margin-top:0; font-size: 0.9rem;">Next Reason</button>
+            <button class="btn magnetic-btn" onclick="nextStage(3)" style="margin-top:0; font-size: 0.9rem;">The Little Things</button>
+        </div>
+    </div>
+
+    <div id="stage-4" class="stage hidden">
+        <h2 style="font-family: var(--font-title); font-size: 2rem;">The Little Things</h2>
+        <p style="color: #aaa;">Hover or tap to reveal</p>
+
+        <div class="flip-grid">
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                <div class="flip-inner">
+                    <div class="flip-front"><h3>01</h3><p>Your Mind</p></div>
+                    <div class="flip-back"><p>"I love how you think, dream, and see the world. You inspire me daily."</p></div>
+                </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                <div class="flip-inner">
+                    <div class="flip-front"><h3>02</h3><p>Your Voice</p></div>
+                    <div class="flip-back"><p>"It is the melody that calms my storms. My favorite sound in the universe."</p></div>
+                </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                <div class="flip-inner">
+                    <div class="flip-front"><h3>03</h3><p>Our Future</p></div>
+                    <div class="flip-back"><p>"The day distance closes to zero will be the best day of my life."</p></div>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn magnetic-btn" onclick="nextStage(4)">Read My Letter</button>
+    </div>
+
+    <div id="stage-5" class="stage hidden">
+        <div class="glass-panel">
+            <h2 class="script-text" style="text-align:left; margin-bottom:1rem;">Dearest Name,</h2>
+            <div id="typewriter-text" class="letter-content"></div>
+            <button class="btn magnetic-btn" id="wish-btn" style="display:none;" onclick="nextStage(5)">Childhood Memories</button>
+        </div>
+    </div>
+
+    <div id="stage-6" class="stage hidden">
+        <h2 style="font-family: var(--font-title); margin-bottom: 2rem; font-size: 2rem;">Core Memories</h2>
+        <p style="color: #aaa; margin-bottom: 2rem;">Little moments... (Hover the photos)</p>
+
+        <div class="memories-container">
+            <div class="polaroid">
+                <img src="https://picsum.photos/400/400?random=2" alt="Childhood 1">
+            </div>
+            <div class="polaroid">
+                <img src="https://picsum.photos/400/400?random=3" alt="Childhood 2">
+            </div>
+            <div class="polaroid">
+                <img src="https://picsum.photos/400/400?random=4" alt="Childhood 3">
+            </div>
+            <div class="polaroid">
+                <img src="https://picsum.photos/400/400?random=5" alt="Childhood 4">
+            </div>
+        </div>
+
+        <button class="btn magnetic-btn" onclick="nextStage(6)">One Special Person</button>
+    </div>
+
+    <div id="stage-7" class="stage hidden">
+        <div class="glass-panel">
+            <h1 class="hero-title" style="font-size: 2.5rem;">The Source of Magic</h1>
+            <p class="script-text" style="font-size: 2rem;">To Her Mom</p>
+            
+            <div class="photo-frame" style="transform: rotate(2deg); margin: 2rem auto;">
+                <img src="https://picsum.photos/800/600?random=6" alt="Mother and Child" style="width: 100%; height: auto;">
+                <div class="photo-caption" style="font-size: 1.5rem;">Thank You</div>
+            </div>
+
+            <p style="margin-bottom: 2rem; font-size: 1.2rem; line-height: 1.6; color: #ddd;">
+                "Thank you for bringing this precious magic into the world. <br>Without you, my favorite person wouldn't exist."
+            </p>
+
+            <button class="btn magnetic-btn" onclick="nextStage(7)">Make a Wish</button>
+        </div>
+    </div>
+
+    <div id="stage-8" class="stage hidden">
+        <h1 class="hero-title" style="font-size: 3rem;">One Last Wish</h1>
+        <p style="color: #ccc; margin-bottom: 2rem;">Close your eyes, think of something beautiful, and click the flame.</p>
+        
+        <div class="candle-wrapper" id="final-candle">
+            <div class="flame" id="flame" onclick="blowCandle()"></div>
+            <div class="candle-stick"></div>
+        </div>
+
+        <div class="glow-message" id="final-msg">
+            Happiest Birthday<br>Name ❤️
+        </div>
+    </div>
+
+    <canvas id="confetti-canvas" style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index: 50;"></canvas>
+
+    <script>
+        /* --- CONFIGURATION --- */
+        const letterText = "Watching you grow this past year has been amazing. \n\nYou inspire me every day with your kindness, your humor, and your energy. Even across the miles, you understand the parts of me I never speak out loud. \n\nI hope this year brings you everything you've been working toward. You deserve the world. \n\nI'm so lucky to know you.";
+
+        /* --- 1. CURSOR LOGIC --- */
+        const cursor = document.getElementById('cursor');
+        const cursorDot = document.getElementById('cursor-dot');
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX - 10 + 'px';
+            cursor.style.top = e.clientY - 10 + 'px';
+            cursorDot.style.left = e.clientX - 2 + 'px';
+            cursorDot.style.top = e.clientY - 2 + 'px';
+
+            // Random Heart Trail
+            if(Math.random() > 0.95) createHeart(e.clientX, e.clientY);
+        });
+
+        /* NEW: Touch support for Love Rain */
+        document.addEventListener('touchmove', (e) => {
+            const touch = e.touches[0];
+            if(Math.random() > 0.85) createHeart(touch.clientX, touch.clientY);
+        }, { passive: true });
+
+        document.addEventListener('click', (e) => {
+            createHeart(e.clientX, e.clientY);
+        });
+
+        /* --- GEN Z FEATURE: MAGNETIC BUTTONS --- */
+        const magneticBtns = document.querySelectorAll('.magnetic-btn');
+        magneticBtns.forEach(btn => {
+            btn.addEventListener('mousemove', (e) => {
+                const rect = btn.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                
+                btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+            });
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = 'translate(0px, 0px)';
+            });
+        });
+
+        /* --- GEN Z FEATURE: PARALLAX PHOTO TILT --- */
+        const photoFrame = document.getElementById('tilt-photo');
+        document.addEventListener('mousemove', (e) => {
+            if(!photoFrame) return;
+            const x = (window.innerWidth / 2 - e.clientX) / 25;
+            const y = (window.innerHeight / 2 - e.clientY) / 25;
+            photoFrame.style.transform = `rotate(-3deg) rotateY(${x}deg) rotateX(${y}deg)`;
+        });
+
+        function createHeart(x, y) {
+            const heart = document.createElement('div');
+            heart.classList.add('heart-trail');
+            heart.innerHTML = '❤';
+            heart.style.left = x + 'px';
+            heart.style.top = y + 'px';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 1000);
+        }
+
+        /* --- 2. NAVIGATION LOGIC --- */
+        function startJourney() {
+            const audio = document.getElementById('bg-music');
+            const musicWidget = document.getElementById('music-pill');
+            
+            if(audio) {
+                audio.volume = 0.4;
+                audio.play().then(() => {
+                    musicWidget.classList.remove('hidden');
+                }).catch(e => console.log("Audio autoplay policy blocked"));
+            }
+            transitionStage(1, 2);
+        }
+
+        function nextStage(current) {
+            transitionStage(current, current + 1);
+            
+            if (current === 1) {
+                setTimeout(runHackerEffect, 800);
+            }
+            if (current === 4) { // Moving to Letter stage (5)
+                setTimeout(typeWriter, 1000);
+            }
+        }
+
+        function transitionStage(from, to) {
+            const fromEl = document.getElementById(`stage-${from}`);
+            const toEl = document.getElementById(`stage-${to}`);
+
+            fromEl.classList.add('fade-out');
+            setTimeout(() => {
+                fromEl.classList.add('hidden');
+                fromEl.classList.remove('fade-out');
+                toEl.classList.remove('hidden');
+                toEl.classList.add('fade-in');
+                window.scrollTo(0, 0); // Scroll to top for new stage
+            }, 800);
+        }
+
+        /* --- GEN Z FEATURE: HACKER TEXT DECODE --- */
+        function runHackerEffect() {
+            const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const h1 = document.getElementById("hacker-title");
+            if(!h1) return;
+            
+            let iteration = 0;
+            const originalText = h1.dataset.value; 
+            
+            let interval = setInterval(() => {
+                h1.innerText = originalText
+                .split("")
+                .map((letter, index) => {
+                    if(index < iteration) {
+                    return originalText[index];
+                    }
+                    return letters[Math.floor(Math.random() * 26)]
+                })
+                .join("");
+                
+                if(iteration >= originalText.length){ 
+                clearInterval(interval);
+                }
+                
+                iteration += 1 / 3;
+            }, 30);
+        }
+
+        /* --- 3. 3D QUOTE SLIDER --- */
+        let currentQuoteIndex = 0;
+        const quotes = document.querySelectorAll('.quote-card');
+        
+        function nextQuote() {
+            if (currentQuoteIndex < quotes.length) {
+                const card = quotes[currentQuoteIndex];
+                card.style.transform = 'translate(200px, 50px) rotate(20deg)';
+                card.style.opacity = '0';
+                currentQuoteIndex++;
+            } else {
+                // Reset
+                quotes.forEach((card, index) => {
+                    card.style.opacity = '1';
+                    let rot = (index % 2 === 0) ? -2 : 2;
+                    let z = index * -10;
+                    card.style.transform = `rotate(${rot}deg) translateZ(${z}px)`;
+                });
+                currentQuoteIndex = 0;
+            }
+        }
+
+        /* --- 4. TYPEWRITER EFFECT --- */
+        let charIndex = 0;
+        function typeWriter() {
+            const el = document.getElementById("typewriter-text");
+            const btn = document.getElementById("wish-btn");
+            if (charIndex < letterText.length) {
+                el.innerHTML += letterText.charAt(charIndex) === '\n' ? '<br>' : letterText.charAt(charIndex);
+                charIndex++;
+                setTimeout(typeWriter, 40);
+            } else {
+                el.classList.remove("typewriter-cursor");
+                btn.style.display = "inline-block";
+                btn.classList.add('fade-in');
+            }
+        }
+
+        /* --- 5. FINALE LOGIC --- */
+        let isBlown = false;
+        function blowCandle() {
+            if(isBlown) return;
+            isBlown = true;
+
+            const candleWrapper = document.getElementById('final-candle');
+            const finalMsg = document.getElementById('final-msg');
+
+            // 1. Blow flame
+            candleWrapper.classList.add('blown');
+
+            // 2. Lights out (Background change)
+            document.body.classList.add('lights-out');
+            
+            // Hide music widget for cinematic ending
+            document.getElementById('music-pill').style.opacity = '0';
+
+            // 3. Fireworks & Confetti
+            startConfetti();
+            startFireworks();
+
+            // 4. Show Message
+            setTimeout(() => {
+                finalMsg.classList.add('visible');
+            }, 1000);
+        }
+
+        /* --- 6. PARTICLES ENGINE (Merged) --- */
+        const canvas = document.getElementById("confetti-canvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particles = [];
+        const colors = ['#eebb44', '#ff006e', '#7b2cbf', '#ffffff'];
+
+        function startConfetti() {
+            for (let i = 0; i < 150; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: -Math.random() * canvas.height,
+                    r: Math.random() * 4 + 1,
+                    d: Math.random() * 5 + 1,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    tilt: Math.floor(Math.random() * 10) - 10,
+                    tiltAngle: 0,
+                    tiltAngleIncremental: (Math.random() * 0.07) + 0.05
+                });
+            }
+            animateParticles();
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((p, i) => {
+                p.tiltAngle += p.tiltAngleIncremental;
+                p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+                p.x += Math.sin(0);
+                p.tilt = Math.sin(p.tiltAngle) * 15;
+
+                ctx.beginPath();
+                ctx.lineWidth = p.r;
+                ctx.strokeStyle = p.color;
+                ctx.moveTo(p.x + p.tilt + p.r / 2, p.y);
+                ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r / 2);
+                ctx.stroke();
+
+                if (p.y > canvas.height) particles[i] = { x: Math.random() * canvas.width, y: -10, r: p.r, d: p.d, color: p.color, tilt: p.tilt, tiltAngle: p.tiltAngle, tiltAngleIncremental: p.tiltAngleIncremental };
+            });
+            requestAnimationFrame(animateParticles);
+        }
+
+        function createFirework(x, y) {
+            const count = 30;
+            for(let i=0; i<count; i++) {
+                const p = document.createElement('div');
+                p.classList.add('firework-particle');
+                p.innerHTML = '❤';
+                p.style.left = x + 'px';
+                p.style.top = y + 'px';
+                p.style.color = colors[Math.floor(Math.random() * colors.length)];
+                
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = 100 + Math.random() * 150;
+                p.style.setProperty('--tx', `${Math.cos(angle) * velocity}px`);
+                p.style.setProperty('--ty', `${Math.sin(angle) * velocity}px`);
+                
+                document.body.appendChild(p);
+                setTimeout(() => p.remove(), 1500);
+            }
+        }
+
+        function startFireworks() {
+            let count = 0;
+            const interval = setInterval(() => {
+                createFirework(
+                    Math.random() * window.innerWidth, 
+                    Math.random() * (window.innerHeight / 2)
+                );
+                count++;
+                if(count > 10) clearInterval(interval);
+            }, 600);
+        }
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+    </script>
+</body>
+</html>
